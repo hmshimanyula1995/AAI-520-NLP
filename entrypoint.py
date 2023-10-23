@@ -1,8 +1,10 @@
 from transformers import BlenderbotTokenizer, TFBlenderbotForConditionalGeneration
 import tensorflow as tf
-import flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import flask-cors
 
-app = flask.Flask(__name__)
+app = Flask(__name__)  # Note the uppercase 'F' in Flask
+CORS(app)
 
 # Load your model
 save_model_directory = "/usr/src/app/bestModel"
@@ -14,13 +16,27 @@ model = TFBlenderbotForConditionalGeneration.from_pretrained(
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    user_input = flask.request.json['user_input']
-    inputs = tokenizer(user_input, return_tensors='tf').input_ids
+    data = request.json
+    user_input = data['user_input']
+    conversation_history = data.get('conversation_history', [])
+
+    conversation_text = ' '.join(conversation_history + [user_input])
+
+    max_length = 128  # Set the maximum sequence length
+    tokens = tokenizer.tokenize(conversation_text)
+    if len(tokens) > max_length:
+        tokens = tokens[-max_length:]  # Keep the last `max_length` tokens
+        conversation_text = tokenizer.convert_tokens_to_string(tokens)
+
+    inputs = tokenizer(conversation_text, return_tensors='tf').input_ids
     outputs = model.generate(inputs, max_new_tokens=100,
                              do_sample=True, top_k=30, top_p=0.85)
     response = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
-    return flask.jsonify({'response': response})
+
+    updated_history = conversation_history + [user_input, f"Bot: {response}"]
+
+    return jsonify({'response': response, 'updated_history': updated_history})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=6000)
+    app.run(host='0.0.0.0', port=4500)

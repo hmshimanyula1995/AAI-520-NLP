@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import { getChatBotResponse } from "../api/messageApi";
 // Define a dark theme
 const darkTheme = createTheme({
   palette: {
@@ -23,21 +23,10 @@ const darkTheme = createTheme({
       main: "#f48fb1",
     },
     background: {
-      default: "#15151a",
+      default: "white",
     },
   },
 });
-
-const dummyData = [
-  {
-    query: "hello",
-    response: "Hello, how can I assist you today?",
-  },
-  {
-    query: "who are you",
-    response: "I am a ChatBot here to assist you.",
-  },
-];
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -48,30 +37,22 @@ const ChatBot = () => {
     setInput(e.target.value);
   };
 
-  const mockApiFetch = (query) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const response =
-          dummyData.find((data) => data.query === query.toLowerCase())
-            ?.response || "I don't know.";
-        resolve(response);
-      }, 1000);
-    });
-  };
-
   const sendMessage = async () => {
     setLoading(true);
-    setMessages([...messages, { isUser: true, text: input }]);
-    const botResponse = await mockApiFetch(input);
+    const userMessage = { isUser: true, text: input };
+    setMessages([...messages, userMessage]);
+
+    const conversationHistory = messages.map((message) => message.text);
+    const botResponse = await getChatBotResponse(input, conversationHistory);
+
     setLoading(false);
     setMessages([
       ...messages,
-      { isUser: true, text: input },
-      { isUser: false, text: botResponse },
+      userMessage,
+      { isUser: false, text: botResponse.response },
     ]);
     setInput("");
   };
-
   const clearChat = () => {
     setMessages([]);
   };
@@ -83,6 +64,9 @@ const ChatBot = () => {
         style={{
           padding: "20px",
           background: "#15151a",
+          borderRadius: 2,
+          borderColor: "white",
+          border: 10,
         }}
       >
         <div
@@ -92,6 +76,8 @@ const ChatBot = () => {
             backgroundColor: "#15151a",
             borderRadius: "10px",
             padding: "10px",
+            borderColor: "white",
+            border: 10,
           }}
         >
           {messages.map((message, index) => (
@@ -99,7 +85,20 @@ const ChatBot = () => {
           ))}
           {loading && (
             <div style={{ textAlign: "center" }}>
-              <CircularProgress />
+              <span
+                style={{
+                  height: "400px",
+                  overflowY: "scroll",
+                  backgroundColor: "#15151a",
+                  borderRadius: "10px",
+                  padding: "10px",
+                  borderColor: "white",
+                  border: 10,
+                  color: "white",
+                }}
+              >
+                Bot is Typing...
+              </span>
             </div>
           )}
         </div>
@@ -110,6 +109,9 @@ const ChatBot = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginTop: "10px",
+            borderRadius: 2,
+            borderColor: "white",
+            border: 1,
           }}
         >
           <TextField
