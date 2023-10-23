@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import {
   Container,
@@ -13,8 +12,20 @@ function App() {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
+      <AppBar
+        position="static"
+        sx={{
+          borderRadius: 2,
+          border: 1,
+        }}
+      >
+        <Toolbar
+          sx={{
+            borderRadius: 2,
+            borderColor: "white",
+            border: 1,
+          }}
+        >
           <Typography
             sx={{
               justifyContent: "center",
@@ -22,7 +33,7 @@ function App() {
             }}
             variant="h6"
           >
-            AAI-520 ChatBot{" "}
+            AAI-520 NLP Final Project Chatbot{" "}
           </Typography>
         </Toolbar>
       </AppBar>
