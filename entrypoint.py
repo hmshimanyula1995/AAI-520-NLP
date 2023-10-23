@@ -14,13 +14,23 @@ model = TFBlenderbotForConditionalGeneration.from_pretrained(
     save_model_directory)
 
 
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok'})
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
     user_input = data['user_input']
     conversation_history = data.get('conversation_history', [])
 
-    conversation_text = ' '.join(conversation_history + [user_input])
+    # Prepare the conversation text
+    conversation_text = ""
+    for i, text in enumerate(conversation_history):
+        speaker = "User:" if i % 2 == 0 else "Bot:"
+        conversation_text += f"{speaker} {text} "
+    conversation_text += f"User: {user_input}"
 
     max_length = 128  # Set the maximum sequence length
     tokens = tokenizer.tokenize(conversation_text)

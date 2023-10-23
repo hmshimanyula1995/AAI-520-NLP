@@ -12,6 +12,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import ClearIcon from "@mui/icons-material/Clear";
 import { getChatBotResponse } from "../api/messageApi";
+
 // Define a dark theme
 const darkTheme = createTheme({
   palette: {
@@ -32,27 +33,47 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sendRequest, setSendRequest] = useState(false);
 
   const handleInput = (e) => {
     setInput(e.target.value);
   };
 
-  const sendMessage = async () => {
-    setLoading(true);
+  const sendMessage = () => {
     const userMessage = { isUser: true, text: input };
     setMessages([...messages, userMessage]);
-
-    const conversationHistory = messages.map((message) => message.text);
-    const botResponse = await getChatBotResponse(input, conversationHistory);
-
-    setLoading(false);
-    setMessages([
-      ...messages,
-      userMessage,
-      { isUser: false, text: botResponse.response },
-    ]);
-    setInput("");
+    setSendRequest(true);
   };
+
+  useEffect(() => {
+    const welcomeMessage = {
+      isUser: false,
+      text: "Hello! I'm Chad Bot, here to assist you. How may I help you today?",
+    };
+    setMessages([welcomeMessage]);
+  }, []);
+
+  useEffect(() => {
+    const fetchResponse = async () => {
+      if (sendRequest) {
+        setLoading(true);
+        const conversationHistory = messages.map((message) => message.text);
+        const botResponse = await getChatBotResponse(
+          input,
+          conversationHistory
+        );
+        setLoading(false);
+        setMessages([
+          ...messages,
+          { isUser: false, text: botResponse.response },
+        ]);
+        setSendRequest(false);
+      }
+    };
+
+    fetchResponse();
+  }, [sendRequest]);
+
   const clearChat = () => {
     setMessages([]);
   };

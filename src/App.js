@@ -33,7 +33,7 @@ function App() {
             }}
             variant="h6"
           >
-            AAI-520 NLP Final Project ChatBot{" "}
+            AAI-520 NLP Final Project Chatbot{" "}
           </Typography>
         </Toolbar>
       </AppBar>
