@@ -1,9 +1,9 @@
 from transformers import BlenderbotTokenizer, TFBlenderbotForConditionalGeneration
 import tensorflow as tf
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import flask-cors
+from flask_cors import CORS
 
-app = Flask(__name__)  # Note the uppercase 'F' in Flask
+app = Flask(__name__)
 CORS(app)
 
 # Load your model
@@ -35,7 +35,7 @@ def predict():
     max_length = 128  # Set the maximum sequence length
     tokens = tokenizer.tokenize(conversation_text)
     if len(tokens) > max_length:
-        tokens = tokens[-max_length:]  # Keep the last `max_length` tokens
+        tokens = tokens[-max_length:]
         conversation_text = tokenizer.convert_tokens_to_string(tokens)
 
     inputs = tokenizer(conversation_text, return_tensors='tf').input_ids
