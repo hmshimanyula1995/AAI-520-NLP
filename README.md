@@ -8,9 +8,9 @@ This repository hosts the code and related files for an AI chatbot powered by a 
 
 ## Repository Structure
 
-- `app/` - Contains the main application code for the chatbot.
-- `docker/` - Dockerfile for containerizing the trained model.
-- `docs/` - Additional documentation including the detailed architecture diagram.
+- `src/` - Contains the main application code for the chatbot.
+- `DockerFile` - Dockerfile for containerizing the trained model.
+- `docs/` - Additional documentation for the project.
 
 ## Dataset
 
